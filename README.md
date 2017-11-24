@@ -1,4 +1,4 @@
-# kings-cup
+# Kings Cup
 
 > Drinking game kings cup
 
