@@ -4,11 +4,28 @@
       <span>Kings Cup</span>
     </header>
     <main>
-      <img @click="showNewCard" :src="img" alt="Vue.js PWA" />
-      <h1>{{ cardTitle }}</h1>
-      <div class="card-description">
-        <p>{{ description }}</p>
-      </div>
+      <section class="container h-100 d-flex align-items-center justify-content-center">
+        <div class="d-block">
+          <div class="card-container d-block">
+            <div class="cards-show position-relative">
+              <img @click.prevent="showNewCard" :src="img" class="card-primary" />
+              <img src="/../../static/img/cards/filler-card.png" class="card-filler" v-if="cardDrawnTotal <= 50" />
+              <img src="/../../static/img/cards/filler-card.png" class="card-filler card-filler--two" v-if="cardDrawnTotal <= 51" />
+            </div>
+            <div class="card-info mt-4">
+              <h1>{{ cardTitle }}</h1>
+              <div class="card-description">
+                <p>{{ description }}</p>
+              </div>
+            </div>
+
+          </div>
+          <div class="card-nav__next text-center">
+            <button @click.prevent="showNewCard" class="btn btn-primary btn-lg">Next Card</button>
+          </div>
+        </div>
+        
+      </section>
     </main>
   </div>
 </template>
@@ -23,6 +40,7 @@ export default {
       img: "",
       description: "",
       cardTitle: "",
+      cardsDrawn: [],
       cardDescription: {
         ace: {
           title: "Waterfall",
@@ -91,13 +109,31 @@ export default {
       }
     };
   },
+  computed: {
+    cardDrawnTotal() {
+      return this.cardsDrawn.length;
+    }
+  },
   methods: {
     showNewCard() {
+      //Prevent from drawing card
+      if (this.cardDrawnTotal == data.length) {
+        return;
+      }
+
       let firstChar;
       this.img = data[Math.floor(Math.random() * data.length)];
       firstChar = this.img;
       firstChar = firstChar.slice(firstChar.lastIndexOf(".") - 2);
       firstChar = firstChar.split(".")[0];
+
+      //Dont show same cards
+      if (this.cardsDrawn.includes(firstChar)) {
+        this.showNewCard();
+        return;
+      }
+
+      this.cardsDrawn.push(firstChar);
       firstChar = firstChar.charAt(0);
 
       switch (firstChar) {
@@ -163,12 +199,18 @@ export default {
 </script>
 
 <style>
+@import url('https://fonts.googleapis.com/css?family=Poppins');
+
+html, body, #app {
+  height: 100%;
+}
+
 body {
   margin: 0;
 }
 
 #app {
-  font-family: "Avenir", Helvetica, Arial, sans-serif;
+  font-family: "Poppins", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
@@ -212,7 +254,6 @@ body {
     rgba(151, 24, 43, 1) 100%
   );
   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#b23346', endColorstr='#97182b', GradientType=1 );
-  min-height: 100vh;
 }
 
 h1 {
@@ -227,16 +268,22 @@ h1 {
 
 main {
   text-align: center;
-  margin-top: 40px;
   height: 100%;
 }
 
 header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
   margin: 0;
   height: 56px;
   padding: 0 16px 0 24px;
   background-color: #35495e;
   color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 header span {
@@ -247,6 +294,52 @@ header span {
   letter-spacing: 0.02em;
   font-weight: 400;
   box-sizing: border-box;
-  padding-top: 16px;
 }
+
+.card-container {
+  min-height: 600px;
+}
+
+.cards-show {
+  z-index: 10;
+}
+
+.card-filler {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%) rotate(5deg);
+  z-index: -1;
+}
+
+.card-filler--two {
+  transform: translateX(-50%) rotate(-5deg);
+}
+
+/* .card-nav__next {
+  position: fixed;
+  bottom: 5rem;
+  left: 0;
+  width: 100%;
+} */
+
+.btn {
+  background-color: #f2ba49;
+  border-color: #f2ba49;
+  border-radius: 80px;
+  min-width: 180px;
+  transition: opacity .3s ease-in-out;
+}
+
+.btn:hover,
+.btn:focus,
+.btn:active {
+  background-color: #f2ba49!important;
+  border-color: #f2ba49!important;
+  outline: none!important;
+  box-shadow: none !important;
+  opacity: 0.8;
+}
+
+
 </style>
