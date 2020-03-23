@@ -1,16 +1,18 @@
 <template>
   <div id="app">
-    <header>
-      <span>Kings Cup</span>
+    <header class="d-flex justify-content-between">
+      <div id="logo" class="d-block"><img src="@/assets/kingcuplogo.png" /></div>
+      <div class=""><button @click.prevent="reset" class="btn btn-outline-primary btn-lg">Reset Game</button></div>
     </header>
     <main>
       <section class="container h-100 d-flex align-items-center justify-content-center">
         <div class="d-block">
+          <h4 class="text-white my-5">Cards drawn: {{cardDrawnTotal}}</h4>
           <div class="card-container d-block">
             <div class="cards-show position-relative">
               <img @click.prevent="showNewCard" :src="img" class="card-primary" />
-              <img src="/../../static/img/cards/filler-card.png" class="card-filler" v-if="cardDrawnTotal <= 50" />
-              <img src="/../../static/img/cards/filler-card.png" class="card-filler card-filler--two" v-if="cardDrawnTotal <= 51" />
+              <img src="@/assets/cards/filler-card.png" class="card-filler" v-if="cardDrawnTotal <= 50" />
+              <img src="@/assets/cards/filler-card.png" class="card-filler card-filler--two" v-if="cardDrawnTotal <= 51" />
             </div>
             <div class="card-info mt-4">
               <h1>{{ cardTitle }}</h1>
@@ -21,7 +23,8 @@
 
           </div>
           <div class="card-nav__next text-center">
-            <button @click.prevent="showNewCard" class="btn btn-primary btn-lg">Next Card</button>
+            <button @click.prevent="showNewCard" class="btn btn-primary btn-lg" v-if="cardDrawnTotal !== cardsTotal">Next Card</button>
+            <button @click.prevent="reset" class="btn btn-primary btn-lg" v-if="cardDrawnTotal === cardsTotal">Reset Game</button>
           </div>
         </div>
         
@@ -32,6 +35,8 @@
 
 <script>
 import data from "./cards.json";
+
+const images = require.context('@/assets/cards', false, /\.png$|\.jpg$/)
 
 export default {
   name: "app",
@@ -112,6 +117,9 @@ export default {
   computed: {
     cardDrawnTotal() {
       return this.cardsDrawn.length;
+    },
+    cardsTotal() {
+      return data.length
     }
   },
   methods: {
@@ -121,11 +129,9 @@ export default {
         return;
       }
 
-      let firstChar;
-      this.img = data[Math.floor(Math.random() * data.length)];
-      firstChar = this.img;
-      firstChar = firstChar.slice(firstChar.lastIndexOf(".") - 2);
-      firstChar = firstChar.split(".")[0];
+      const randomImg = data[Math.floor(Math.random() * data.length)];
+      this.img = this.loadImg(randomImg);
+      let firstChar = randomImg.slice(randomImg.lastIndexOf(".") - 2).split(".")[0];
 
       //Dont show same cards
       if (this.cardsDrawn.includes(firstChar)) {
@@ -190,6 +196,13 @@ export default {
           this.description = this.cardDescription.king.desc;
           break;
       }
+    },
+    loadImg(imgPath) {
+      return images('./' + imgPath)
+    },
+    reset() {
+      this.cardsDrawn = [];
+      this.showNewCard();
     }
   },
   mounted() {
@@ -256,6 +269,10 @@ body {
   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#b23346', endColorstr='#97182b', GradientType=1 );
 }
 
+.flex-1 {
+  flex: 1!important;
+}
+
 h1 {
   color: #fff;
 }
@@ -281,9 +298,14 @@ header {
   padding: 0 16px 0 24px;
   background-color: #35495e;
   color: #ffffff;
-  display: flex;
+  display: flex!important;
   align-items: center;
   justify-content: center;
+}
+
+#logo img {
+  height: 50px;
+  width: auto;
 }
 
 header span {
@@ -324,11 +346,19 @@ header span {
 } */
 
 .btn {
-  background-color: #f2ba49;
-  border-color: #f2ba49;
-  border-radius: 80px;
-  min-width: 180px;
-  transition: opacity .3s ease-in-out;
+  border-radius: 80px!important;
+  min-width: 180px!important;
+  transition: opacity .3s ease-in-out!important;
+}
+
+.btn-primary {
+  background-color: #f2ba49!important;
+  border-color: #f2ba49!important;
+}
+
+.btn-outline-primary {
+  color: #f2ba49!important;
+  border-color: #f2ba49!important;
 }
 
 .btn:hover,
@@ -338,7 +368,7 @@ header span {
   border-color: #f2ba49!important;
   outline: none!important;
   box-shadow: none !important;
-  opacity: 0.8;
+  opacity: 0.8!important;
 }
 
 
